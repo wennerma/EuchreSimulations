@@ -20,16 +20,24 @@ class Player:
   def add_cards(self, cards):
     self.hand.append(cards)
   
-  def play_card(self):
-    card = self.hand.pop()
-
-    return card
+  def play_card(self, suit_set):
+    if suit_set == False:
+      return self.hand.pop()
+    else:
+      # TODO: find correct suit to play
+      return self.hand.pop()
 
 
 class Card:
   def __init__(self, suit, rank):
     self.suit = suit
     self.rank = rank
+
+  def value(self, trump):
+    if self.suit != trump:
+      return RANKS.index(self.rank)
+    
+    # else we need to determine the rank of trump cards
 
 
 class Euchre:
@@ -67,11 +75,14 @@ class Euchre:
 
 
   def play(self):
-    game = 0
-
-    while game < self.number_of_rounds:
-      deck = self.create_deck()
+    round = 0
+    deck = self.create_deck()
+    while round < self.number_of_rounds:
       random.shuffle(deck)
+
+      # Randomize who gets dealt first card, should we deal first black jack?
+      random.shuffle(self.players)
+
       self.deal_round(deck)
       trump = self.undealt_cards[0]
       print('Hand dealt with trump: ' + trump.suit)
@@ -79,22 +90,33 @@ class Euchre:
       hand = 0
       while hand < 5:
         plays = []
+        suit_set = False
+        best_hand = {'player_id': '', 'card': ''}
         for i in self.players:
-          card = i.play_card()
+          card = i.play_card(suit_set)
+          # This is the first card played, set the suit and assign it as best card by default
+          if suit_set == False:
+            suit_set = card.suit
+            best_hand['player_id'] = i.id
+            best_hand['card'] = card
+          # else:
+            # we'll compare each card as it's dealt, and keep the best_card
+            
+              
           plays.append(card)
 
           print('Player ' + str(i.id) + ' played ' + card.rank + ' of ' + card.suit)
         hand+=1
 
-      print('Round ' + str(game) + ' complete')
+      print('Round ' + str(round) + ' complete')
       print('')
       print('')
-      game+=1
-
+      round+=1
 
 
 simulation = Euchre(10, FREE_PLAY)
 simulation.play()
+
 
 
 
